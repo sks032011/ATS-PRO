@@ -1,0 +1,14 @@
+# Dependency directories
+node_modules/
+
+# Environment variables
+.env
+.env.local
+
+# Build outputs
+dist/
+build/
+
+checkEmbeddingModels.js
+test-pinecone-delete.js
+test-server.js
