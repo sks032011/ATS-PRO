@@ -20,11 +20,36 @@ exports.rankCandidates = async (jobDescription, candidates) => {
         }
 
         const candidatesData = validCandidates.map(c =>
-            `ID: ${c.id || c._id}\nResume Snippet: ${c.resumeText.substring(0, 2000)}`
+            `ID: ${c.id || c._id}\nResume Snippet: ${c.resumeText.substring(0, 6000)}`
         ).join("\n\n---\n\n");
 
+// const prompt =
+// `You are an expert HR recruiter. Rank the following candidates for the job description below.
+
+// JOB DESCRIPTION:
+// ${jobDescription}
+
+// CANDIDATES:
+// ${candidatesData}
+
+// INSTRUCTIONS:
+// - Rank all candidates from best to worst match.
+// - In the "reason" field, explicitly state which JD requirements were matched and which were missing.
+// - CRITICAL: PDF text is often unstructured. Before stating a skill is missing, you MUST scan the entire resume snippet character-by-character, including "Certifications", "Extra-Curriculars", and "Projects".
+// - If a skill is listed as a certification or used in a project, you must consider it a match.
+// - Base all reasoning strictly on resume content — do not infer or assume.
+// - matchScore must be an integer between 0 and 100.
+// - candidateId must exactly match the ID provided above.
+
+// Return a JSON object with a single key "rankings" containing an array:
+// {
+//   "rankings": [
+//     { "candidateId": "EXACT_ID", "matchScore": 85, "reason": "..." },
+//     ...
+//   ]
+// }`;
 const prompt =
-`You are an expert HR recruiter. Rank the following candidates for the job description below.
+`You are a strict, objective HR ATS system. Rank the candidates based ONLY on the exact requirements in the JOB DESCRIPTION.
 
 JOB DESCRIPTION:
 ${jobDescription}
@@ -32,14 +57,16 @@ ${jobDescription}
 CANDIDATES:
 ${candidatesData}
 
-INSTRUCTIONS:
-- Rank all candidates from best to worst match.
-- In the "reason" field, explicitly state which JD requirements were matched and which were missing.
-- CRITICAL: PDF text is often unstructured. Before stating a skill is missing, you MUST scan the entire resume snippet character-by-character, including "Certifications", "Extra-Curriculars", and "Projects".
-- If a skill is listed as a certification or used in a project, you must consider it a match.
-- Base all reasoning strictly on resume content — do not infer or assume.
-- matchScore must be an integer between 0 and 100.
-- candidateId must exactly match the ID provided above.
+STRICT INSTRUCTIONS:
+1. NO HALLUCINATIONS: Do not pretend a certificate or skill matches if it does not explicitly share the domain. (e.g., Data Analytics is NOT Computer Networking). If they lack the exact requirement requested, penalize their score heavily.
+2. DEEP SCAN: Scan the ENTIRE text character-by-character. Certifications are often at the very bottom.
+3. SCORING RUBRIC:
+   - 100: Exact match on the specific requested skill or certificate.
+   - 50-80: Partial match (has some related skills but missing the core certificate).
+   - 0-40: Missing the primary requested skill or certificate entirely.
+4. Base all reasoning strictly on resume content.
+5. matchScore must be an integer between 0 and 100.
+6. candidateId must exactly match the ID provided above.
 
 Return a JSON object with a single key "rankings" containing an array:
 {
