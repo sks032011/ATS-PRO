@@ -23,7 +23,7 @@ exports.rankCandidates = async (jobDescription, candidates) => {
             `ID: ${c.id || c._id}\nResume Snippet: ${c.resumeText.substring(0, 2000)}`
         ).join("\n\n---\n\n");
 
-        const prompt =
+const prompt =
 `You are an expert HR recruiter. Rank the following candidates for the job description below.
 
 JOB DESCRIPTION:
@@ -35,7 +35,8 @@ ${candidatesData}
 INSTRUCTIONS:
 - Rank all candidates from best to worst match.
 - In the "reason" field, explicitly state which JD requirements were matched and which were missing.
-- Include non-technical criteria (leadership, teamwork, extracurriculars) if present in the resume.
+- CRITICAL: PDF text is often unstructured. Before stating a skill is missing, you MUST scan the entire resume snippet character-by-character, including "Certifications", "Extra-Curriculars", and "Projects".
+- If a skill is listed as a certification or used in a project, you must consider it a match.
 - Base all reasoning strictly on resume content — do not infer or assume.
 - matchScore must be an integer between 0 and 100.
 - candidateId must exactly match the ID provided above.
@@ -102,8 +103,8 @@ exports.extractCandidateInfo = async (resumeText) => {
     try {
         const cleanText = resumeText.substring(0, 6000);
 
-        const prompt =
-`You are an expert resume parser. Extract structured information from the resume below.
+const prompt =
+`You are an expert ATS parser. Extract structured information from the raw resume text below.
 
 RESUME:
 """
@@ -119,14 +120,16 @@ Return a JSON object with exactly these keys:
   "summary":    "One concise sentence describing the candidate."
 }
 
-Rules:
-- skills:     ALL technical skills — languages, frameworks, libraries, tools, platforms. Be specific (e.g. "React" not "Web Development").
-- education:  "Degree - Institution (Graduation Year)" format. Use [] if not found.
-- experience: "Role - Company (Duration)" format. Include internships. Use [] if not found.
-- projects:   "Project Name - what it does and tech used". Include personal/academic projects. Use [] if not found.
-- summary:    One sentence only.
-- No nested objects. No extra keys.`;
-
+CRITICAL PARSING RULES:
+1. PDF parsers mash table columns together. Read character-by-character and extract skills hidden in merged sentences.
+2. DO NOT just look at the "Skills" section. You MUST deeply scan "Certifications", "Extra-Curriculars", and "Projects" for mentioned technologies.
+3. If a technology (e.g., "R", "Django", "Python") is mentioned ANYWHERE in the document, it MUST be included in the "skills" array.
+4. "skills" must be a flat array of specific technologies (languages, frameworks, DBs, tools).
+5. "education": "Degree - Institution (Graduation Year)" format. Use [] if not found.
+6. "experience": "Role - Company (Duration)" format. Include internships. Use [] if not found.
+7. "projects": "Project Name - what it does and tech used". Use [] if not found.
+8. "summary": One sentence only.
+9. No nested objects. No extra keys.`;
         const chatCompletion = await groq.chat.completions.create({
             messages: [{ role: 'user', content: prompt }],
             model: 'llama-3.3-70b-versatile',
