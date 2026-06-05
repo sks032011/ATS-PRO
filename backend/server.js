@@ -19,16 +19,16 @@ const analyzeRoutes = require('./routes/analyzeRoutes');
 
 
 // middleware
-app.use(express.json({ limit: '10mb' }));//if user wants to type big job descr s
+app.use(express.json({ limit: '10mb' }));//if user wants to type big job descr s(.json for turnin json doc ro req.body)
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // db connectn
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("✅ MongoDB Connected"))
-    .catch(err => console.error("❌ DB Connection Error:", err));
+    .then(() => console.log(" mongoDB connected"))
+    .catch(err => console.error(" db connection error:", err));
 
 // Routes
 app.use('/api/upload', uploadRoutes);
 app.use('/api/analyze', analyzeRoutes); 
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));//no w backend can rcv requests
