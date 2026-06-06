@@ -22,7 +22,7 @@ const ResumeCard = ({ candidate, onClick }) => {
           <p className="text-sm text-zinc-500 truncate">{candidate.email}</p>
         </div>
         
-        {/* 📱 shrink-0 pill was squishing in long mail */}
+        {/*   shrink-0 pill was squishing in long mail */}
         <div className={`shrink-0 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold border ${getScoreColor(candidate.matchScore)}`}>
           {candidate.matchScore}% Match
         </div>

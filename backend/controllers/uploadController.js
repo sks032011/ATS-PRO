@@ -27,16 +27,16 @@ exports.handleResumeUpload = async (req, res) => {
         }
 
         // 1. PARSE PDF
-        const pdfData = await pdfParse(file.buffer);
+        const pdfData = await pdfParse(file.buffer);//binary pdf to readable text
         const resumeText = pdfData.text;
 
         if (resumeText.length < 50) {
             return res.status(400).json({ error: "PDF too short or unreadable" });
         }
 
-        // 2. EXTRACT STRUCTURED DATA (NEW)
-        console.log("extracting structured data...");
-        const structuredData = await extractCandidateInfo(resumeText);
+        // 2. EXTRACT STRUCTURED DATA 
+        // console.log("extracting structured data...");
+        const structuredData = await extractCandidateInfo(resumeText);//rankingService.js
         
         if (structuredData.extractionFailed) {
             console.warn("extraction failed, using fallback data");
@@ -45,7 +45,7 @@ exports.handleResumeUpload = async (req, res) => {
         }
 
         // 3. DETERMINE EMAIL AND NAME
-        const candidateEmail = email || extractEmail(resumeText) || "";
+        const candidateEmail = email || extractEmail(resumeText) || "";//best to take the manually entrd mail but fallback is also there
         const cleanName = file.originalname.replace('.pdf', '');
         const uniqueName = `${cleanName}_${Date.now()}`;
 
@@ -77,16 +77,16 @@ exports.handleResumeUpload = async (req, res) => {
             pdfData: file.buffer,
             contentType: file.mimetype,
             pineconeId: mongoId,
-            structuredData: structuredData, 
+            structuredData: structuredData, //store metadata
             status: 'New'
         });
 
         const savedCandidate = await newCandidate.save();
-        console.log(`✅ Uploaded candidate: ${mongoId}`);
+        console.log(`uploaded candidate: ${mongoId}`);
 
         // 7. AI RANKING (if JD provided)
         let finalResponse = savedCandidate.toObject();
-        delete finalResponse.pdfData;
+        delete finalResponse.pdfData; //store PDF permanently in db but don’t send it in upload response
 
         if (jobDescription) {
             const ranking = await rankCandidates(jobDescription, [{
@@ -147,7 +147,7 @@ exports.searchCandidates = async (req, res) => {
 
         const enrichedResults = candidates.map(candidate => {
             const aiVerdict = aiRanking.find(r =>
-                r.candidateId === candidate._id.toString() ||
+                r.candidateId === candidate._id.toString() || //groq returned string ids mongo gives object
                 r.candidateId === candidate.pineconeId
             );
 
@@ -161,7 +161,7 @@ exports.searchCandidates = async (req, res) => {
             };
         });
 
-        enrichedResults.sort((a, b) => b.matchScore - a.matchScore);
+        enrichedResults.sort((a, b) => b.matchScore - a.matchScore); //highest score first
         res.json({ matches: enrichedResults });
 
     } catch (error) {
@@ -199,13 +199,13 @@ exports.deleteCandidate = async (req, res) => {
 
         if (candidate.pineconeId && candidate.pineconeId !== 'pending') {
             try {
-                await index.deleteOne(candidate.pineconeId);
+                await index.deleteOne(candidate.pineconeId);//delete from pcone first 
             } catch (e) {
                 console.warn("pinecone delete failed, continuing...");
             }
         }
 
-        await Candidate.findByIdAndDelete(id);
+        await Candidate.findByIdAndDelete(id);//finally from mongo
         res.json({ message: "Deleted successfully" });
 
     } catch (error) {

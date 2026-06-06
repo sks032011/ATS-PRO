@@ -8,7 +8,7 @@ const upload = multer({
     },
     fileFilter: (req, file, cb) => {
         if (file.mimetype !== 'application/pdf') {
-            return cb(new Error('Only PDF files are allowed'));
+            return cb(new Error('Only PDF files are allowed'));//callback fn continue/reject 
         }
 
         cb(null, true);

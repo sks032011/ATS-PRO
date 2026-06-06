@@ -27,14 +27,14 @@ const UploadPage = () => {
     setIsUploading(true);
     setError("");
 
-    const formData = new FormData();
-    formData.append('resume', file);
-    if (jobDescription) formData.append('jobDescription', jobDescription);
+    const formData = new FormData();//sent as bytes
+    formData.append('resume', file);//field name attached with file
+    if (jobDescription) formData.append('jobDescription', jobDescription);//attach additional info with form data
     if (email) formData.append('email', email);
 
     try {
       const response = await uploadResume(formData);
-      navigate('/', { state: { newResult: response.data.candidate } });
+      navigate('/', { state: { newResult: response.data.candidate } });//after successful upload go to dashboard, carry uploaded candidate object through router state(location.state.newResult)
     } catch (err) {
       setError(err.response?.data?.error || "Upload failed. Check backend.");
     } finally {
