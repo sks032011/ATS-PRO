@@ -1,5 +1,5 @@
 const Groq = require('groq-sdk');
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });//crete api client
 
 // ─── Candidate Ranking ────────────────────────────────────────────────────────
 
@@ -83,14 +83,15 @@ Return a JSON object with a single key "rankings" containing an array:
             return [];
         }
 
-        const rankings = Array.isArray(parsed.rankings) ? parsed.rankings : [];
+        const rankings = Array.isArray(parsed.rankings) ? parsed.rankings : [];//protction....if rnking is not array then use [] and ranking is candID ,mscore and reason 
 
+        //VALIDATION 
         const validatedRankings = rankings
-            .filter(r => r && r.candidateId !== undefined && r.candidateId !== null)
+            .filter(r => r && r.candidateId !== undefined && r.candidateId !== null)//candID is necessary filter
             .map(r => ({
                 candidateId: String(r.candidateId).trim(),
-                matchScore: Number.isFinite(Number(r.matchScore))
-                    ? Math.min(100, Math.max(0, Math.round(Number(r.matchScore))))
+                matchScore: Number.isFinite(Number(r.matchScore))//ninety to 90 ...null empty are filtered 
+                    ? Math.min(100, Math.max(0, Math.round(Number(r.matchScore))))//clamping the score bq 0 to 100...ex .-10 to 0 ..92.3 to 92
                     : 0,
                 reason: typeof r.reason === 'string' && r.reason.trim().length > 0
                     ? r.reason.trim()
@@ -158,18 +159,18 @@ CRITICAL PARSING RULES:
             response_format: { type: "json_object" },
         });
 
-        const rawContent = chatCompletion.choices[0]?.message?.content || "{}";
+        const rawContent = chatCompletion.choices[0]?.message?.content || "{}";//contains
 
         let parsed;
         try {
-            parsed = JSON.parse(rawContent.trim());
+            parsed = JSON.parse(rawContent.trim());//json string to object of js
         } catch (parseError) {
             console.error("JSON parse failed in extractCandidateInfo:", parseError.message);
             throw new Error("Failed to parse AI extraction response");
         }
 
         const sanitizeStringArray = (val) =>
-            Array.isArray(val)
+            Array.isArray(val)//check if array then filer only strings then one by one remove trail spaces 
                 ? val.filter(s => typeof s === 'string' && s.trim().length > 0).map(s => s.trim())
                 : [];
 

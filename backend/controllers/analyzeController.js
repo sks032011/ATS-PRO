@@ -3,7 +3,7 @@ const { extractCandidateInfo } = require('../services/rankingService');
 
 // ─── rate limiting ───────────────────────────────────────────────────────
 
-const rateLimitMap = new Map(); 
+const rateLimitMap = new Map(); //in memry map rate limiter ....10 reqs/hour 
 
 const checkRateLimit = (ip) => {
     const now = Date.now();
@@ -100,6 +100,8 @@ const detectSectionHeaders = (text) => {
     return sectionPatterns.filter(p => p.test(text)).length;
 };
 
+// ======================================================================================
+
 //
 // max 100 points, distributed across 7 weighted factors:
 //
@@ -131,7 +133,7 @@ const calculateATSScore = (resumeText, structuredData) => {
 
     // ── 2. skills quality (25 pts) ───────────────────────────────────────────
     let skillScore = 0;
-    const skills        = structuredData.skills || [];
+    const skills        = structuredData.skills || [];//got it from rankingServive...called below in calcAtsscore()
     const totalSkills   = skills.length;
     const modernSkills  = countModernSkills(skills);
     const dupeCount     = detectDuplicateSkills(skills);
@@ -197,9 +199,9 @@ const calculateATSScore = (resumeText, structuredData) => {
     if (eduCount >= 1) eduScore += 7;
     if (eduCount >= 2) eduScore += 3;
 
-    // Bonus for CGPA / GPA mention (shows strong academic record)
+    // Bonus for CGPA mention
     if (/\b(cgpa|gpa|grade point)\s*[:\-]?\s*[0-9.]+/i.test(resumeText)) eduScore += 0; // neutral, already counted
-    // Minor bonus for top-tier institution keywords
+    // Minor bonus for mid to top tier institution kw
     if (/\b(iit|nit|bits|iiit|iim|vit|srm|manipal|delhi university)\b/i.test(resumeText)) eduScore = Math.min(eduScore + 1, 10);
 
     eduScore = Math.min(Math.round(eduScore), 10);
@@ -359,7 +361,12 @@ const identifyStrengths = (resumeText, structuredData, scoreResult) => {
     return strengths;
 };
 
+// =============================================================================================================================
+
+
+
 // ─── Main Handler ─────────────────────────────────────────────────────────────
+//FROM router.post('/', upload.single('resume'), analyzeResume);   req.file.buffer accessable
 
 exports.analyzeResume = async (req, res) => {
     try {
@@ -377,6 +384,8 @@ exports.analyzeResume = async (req, res) => {
         }
 
         const pdfData = await pdfParse(file.buffer);
+
+        //RESUME TExT 
         const resumeText = pdfData.text;
 
         if (resumeText.length < 50) {
@@ -385,7 +394,7 @@ exports.analyzeResume = async (req, res) => {
 
         console.log(`Analysing resume (${resumeText.length} chars)...`);
 
-        const structuredData = await extractCandidateInfo(resumeText);
+        const structuredData = await extractCandidateInfo(resumeText);//call rankingService 
 
         if (structuredData.extractionFailed) {
             console.warn("structured extraction failed,scoring from raw text only.");

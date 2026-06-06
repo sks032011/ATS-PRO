@@ -12,10 +12,11 @@ const Dashboard = () => {
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [loadingText, setLoadingText] = useState("Analyzing...");
 
+  //if another pg navgates here wt cand data show it immdtly
   useEffect(() => {
     if (location.state && location.state.newResult) {
       setCandidates([location.state.newResult]);
-      window.history.replaceState({}, document.title);
+      window.history.replaceState({}, document.title);//remove this newesult here so that it doesnt use this old data again 
     }
   }, [location]);
 
@@ -166,7 +167,7 @@ const Dashboard = () => {
                   {selectedCandidate.structuredData.skills && selectedCandidate.structuredData.skills.length > 0 && (
                     <div>
                       <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3">
-                        💼 Skills
+                         Skills
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {selectedCandidate.structuredData.skills.map((skill, idx) => (
@@ -267,3 +268,18 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+// Candidate
+// {
+//    _id,
+//    resumeUrl,
+//    score,
+//    createdAt,
+
+//    structuredData: {
+//       name,
+//       email,
+//       skills,
+//       education,
+//       experience
+//    }
+// }
