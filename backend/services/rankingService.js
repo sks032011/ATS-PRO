@@ -68,7 +68,7 @@ Return a JSON object with a single key "rankings" containing an array:
 
         const chatCompletion = await groq.chat.completions.create({
             messages: [{ role: 'user', content: prompt }],
-            model: 'llama-3.3-70b-versatile',
+            model: "openai/gpt-oss-120b",
             temperature: 0.1,
             response_format: { type: "json_object" },
         });
@@ -154,7 +154,7 @@ CRITICAL PARSING RULES:
 
         const chatCompletion = await groq.chat.completions.create({
             messages: [{ role: 'user', content: prompt }],
-            model: 'llama-3.3-70b-versatile',
+           model: "openai/gpt-oss-120b",
             temperature: 0.1,
             response_format: { type: "json_object" },
         });
