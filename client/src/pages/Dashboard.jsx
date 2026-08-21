@@ -26,7 +26,7 @@ const Dashboard = () => {
         "Parsing PDF Content...",
         "Generating Vector Embeddings...",
         "Querying Pinecone Index...",
-        "Running Llama-3 Inference...",
+        "Running GPT-OSS Inference...",
         "Finalizing Match Scores..."
       ];
       let i = 0;
@@ -77,7 +77,7 @@ const Dashboard = () => {
             </span>
             System Status: Online
           </div>
-          <div className="px-3 sm:px-4 py-2 bg-zinc-100 text-zinc-700 rounded-lg text-xs sm:text-sm font-medium border border-zinc-200 w-fit"> Llama-3</div>
+          <div className="px-3 sm:px-4 py-2 bg-zinc-100 text-zinc-700 rounded-lg text-xs sm:text-sm font-medium border border-zinc-200 w-fit"> GPT-OSS</div>
           <div className="px-3 sm:px-4 py-2 bg-zinc-100 text-zinc-700 rounded-lg text-xs sm:text-sm font-medium border border-zinc-200 w-fit"> Vector DB: Pinecone</div>
         </div>
 

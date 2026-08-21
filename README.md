@@ -20,7 +20,7 @@ Converts resumes and job descriptions into vector embeddings using Google Gemini
 
 ### AI-Powered Candidate Ranking
 
-Uses LLaMA-3 via Groq to generate recruiter-style reasoning and match scores based on job description relevance.
+Uses GPT-OSS via Groq to generate recruiter-style reasoning and match scores based on job description relevance.
 
 ### ATS Resume Analyzer
 
@@ -87,7 +87,7 @@ Built with React and Tailwind CSS with:
 ## AI Models
 
 * Google Gemini Embeddings (`gemini-embedding-001`)
-* LLaMA-3 via Groq (`llama-3.3-70b-versatile`)
+* GPT-OSS via Groq (`gpt-oss-120B`)
 
 ---
 
@@ -102,7 +102,7 @@ Express API Server
        ↓
 PDF Parsing Layer
        ↓
-AI Extraction (Groq / LLaMA-3)
+AI Extraction (Groq / GPT-OSS)
        ↓
 Embedding Generation (Gemini)
        ↓
@@ -117,7 +117,7 @@ Pinecone Vector Search + MongoDB Storage
 
 1. User uploads a PDF resume
 2. PDF text is extracted using `pdf-parse`
-3. LLaMA-3 extracts structured candidate information
+3. GPT-OSS extracts structured candidate information
 4. Gemini generates vector embeddings
 5. Embeddings are stored in Pinecone
 6. Candidate metadata is stored in MongoDB
@@ -127,7 +127,7 @@ Pinecone Vector Search + MongoDB Storage
 1. Recruiter enters a job description
 2. Job description is converted into embeddings
 3. Pinecone retrieves semantically similar candidates
-4. LLaMA-3 reranks candidates and generates reasoning
+4. GPT-OSS reranks candidates and generates reasoning
 
 ### ATS Analysis Flow
 
